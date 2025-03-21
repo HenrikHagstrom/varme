@@ -1,7 +1,5 @@
 import os
 import time
-import Adafruit_GPIO.SPI as SPI
-import Adafruit_MAX31855.MAX31855 as MAX31855
 import board
 import busio
 import adafruit_sht31d
@@ -23,23 +21,7 @@ def read_temperature(sensor_id):
     except (FileNotFoundError, ValueError, IndexError) as e:
         print(f"Error reading {sensor_id}: {e}")
     return None
-
-def initialize_max31855():
-    """Initialize MAX31855 thermocouple sensors."""
-    sensors = {
-        "thermo_rok": MAX31855.MAX31855(CLK=25, CS=24, DO=23),
-        "thermo_eld": MAX31855.MAX31855(CLK=22, CS=17, DO=27)
-    }
-    return sensors
-
-def read_max31855(sensor):
-    """Read temperature from a MAX31855 sensor."""
-    try:
-        return sensor.readTempC()
-    except Exception as e:
-        print(f"Error reading MAX31855: {e}")
-    return None
-
+  
 def initialize_sht31():
     """Initialize SHT31 sensors."""
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -68,20 +50,11 @@ def main():
         "temp_fwd": "28-0115c2a6e4ff"
     }
 
-    sensors_max31855 = initialize_max31855()
     sensors_sht31 = initialize_sht31()
 
     print("Reading fixed DS18B20 sensors...")
     for name, sensor_id in sensors_ds18b20.items():
         temp = read_temperature(sensor_id)
-        if temp is not None:
-            print(f"{name}: {temp:.2f}°C")
-        else:
-            print(f"{name}: Error reading temperature")
-
-    print("\nReading MAX31855 thermocouples...")
-    for name, sensor in sensors_max31855.items():
-        temp = read_max31855(sensor)
         if temp is not None:
             print(f"{name}: {temp:.2f}°C")
         else:
